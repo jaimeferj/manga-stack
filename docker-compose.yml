@@ -1,0 +1,60 @@
+name: manga-learning-stack
+
+services:
+  suwayomi-server:
+    image: ghcr.io/suwayomi/tachidesk:master
+    container_name: suwayomi-server
+    restart: unless-stopped
+    ports:
+      - "4567:4567"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+    volumes:
+      - suwayomi-data:/data
+
+  webui:
+    build:
+      context: ../Suwayomi-WebUI-jl
+      dockerfile: ../manga-stack/webui/Dockerfile
+    container_name: suwayomi-webui-jl
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - suwayomi-server
+
+  learning-service:
+    build:
+      context: ../manga-learning-service
+      dockerfile: ../manga-stack/learning-service/Dockerfile
+    container_name: manga-learning-service
+    restart: unless-stopped
+    ports:
+      - "8765:8765"
+    environment:
+      - MANGA_LEARNING_HOST=0.0.0.0
+      - MANGA_LEARNING_PORT=8765
+      - MANGA_LEARNING_CACHE_DB_PATH=/data/cache.db
+      - MANGA_LEARNING_OCR_BACKEND=mokuro
+      - MANGA_LEARNING_OCR_FORCE_CPU=false
+      - MANGA_LEARNING_ANKI_ENABLED=true
+      - MANGA_LEARNING_AI_ENABLED=${MANGA_LEARNING_AI_ENABLED:-false}
+      - MANGA_LEARNING_AI_PROVIDER=minimax
+      - MANGA_LEARNING_AI_MINIMAX_API_KEY=${MANGA_LEARNING_AI_MINIMAX_API_KEY:-}
+      - MANGA_LEARNING_AI_MINIMAX_BASE_URL=${MANGA_LEARNING_AI_MINIMAX_BASE_URL:-https://api.minimax.io/v1}
+      - MANGA_LEARNING_AI_MINIMAX_MODEL=${MANGA_LEARNING_AI_MINIMAX_MODEL:-MiniMax-M3}
+    volumes:
+      - learning-data:/data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+volumes:
+  suwayomi-data:
+  learning-data:
