@@ -2,17 +2,14 @@ name: manga-learning-stack
 
 services:
   suwayomi-server:
-    image: ghcr.io/suwayomi/suwayomi-server:master
-    container_name: suwayomi-server
-    restart: unless-stopped
-    ports:
-      - "4567:4567"
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=UTC
+    image: ghcr.io/suwayomi/suwayomi-server:stable
+    container_name: Suwayomi-Server
     volumes:
-      - suwayomi-data:/home/suwayomi/.local/share/Tachidesk
+      - ./downloads:/home/suwayomi/.local/share/Tachidesk/downloads
+      - ./files:/home/suwayomi/.local/share/Tachidesk
+    ports:
+      - "4568:4567"
+    restart: unless-stopped
 
   webui:
     build:
@@ -56,5 +53,4 @@ services:
             - capabilities: [gpu]
 
 volumes:
-  suwayomi-data:
   learning-data:
