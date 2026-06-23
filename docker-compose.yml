@@ -14,7 +14,6 @@ services:
   webui:
     build:
       context: ../Suwayomi-WebUI-jl
-      dockerfile: ../manga-stack/webui/Dockerfile
     container_name: suwayomi-webui-jl
     restart: unless-stopped
     ports:
@@ -27,7 +26,6 @@ services:
   learning-service:
     build:
       context: ../manga-learning-service
-      dockerfile: ../manga-stack/learning-service/Dockerfile
     container_name: manga-learning-service
     restart: unless-stopped
     ports:
@@ -37,7 +35,7 @@ services:
       - MANGA_LEARNING_PORT=8765
       - MANGA_LEARNING_CACHE_DB_PATH=/data/cache.db
       - MANGA_LEARNING_OCR_BACKEND=mokuro
-      - MANGA_LEARNING_OCR_FORCE_CPU=false
+      - MANGA_LEARNING_OCR_FORCE_CPU=${MANGA_LEARNING_OCR_FORCE_CPU:-true}
       - MANGA_LEARNING_ANKI_ENABLED=true
       - MANGA_LEARNING_AI_ENABLED=${MANGA_LEARNING_AI_ENABLED:-false}
       - MANGA_LEARNING_AI_PROVIDER=minimax
@@ -46,11 +44,6 @@ services:
       - MANGA_LEARNING_AI_MINIMAX_MODEL=${MANGA_LEARNING_AI_MINIMAX_MODEL:-MiniMax-M3}
     volumes:
       - learning-data:/data
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
 
 volumes:
   learning-data:
