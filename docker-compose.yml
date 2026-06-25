@@ -49,6 +49,10 @@ services:
       - MANGA_LEARNING_AI_MINIMAX_MODEL=${MANGA_LEARNING_AI_MINIMAX_MODEL:-MiniMax-M3}
     volumes:
       - learning-data:/data
+      - learning-models:/root/.cache/manga-ocr
+      - learning-hf-cache:/root/.cache/huggingface
 
 volumes:
   learning-data:
+  learning-models:
+  learning-hf-cache:
